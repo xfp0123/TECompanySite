@@ -106,7 +106,7 @@ revealEls.forEach(el => {
   revealObserver.observe(el);
 });
 
-/* ── Contact Form ────────────────────────── */
+/* ── Contact Form (Formspree) ────────────── */
 document.getElementById('contactForm').addEventListener('submit', function(e) {
   e.preventDefault();
   const btn     = document.getElementById('submitBtn');
@@ -114,12 +114,26 @@ document.getElementById('contactForm').addEventListener('submit', function(e) {
   btn.textContent = '发送中…';
   btn.disabled    = true;
 
-  // Replace with real form endpoint (e.g. Formspree, EmailJS) in production
-  setTimeout(() => {
-    success.classList.add('show');
-    this.reset();
+  fetch('https://formspree.io/f/mvzjlngl', {
+    method: 'POST',
+    body: new FormData(this),
+    headers: { 'Accept': 'application/json' }
+  })
+  .then(res => res.json())
+  .then(data => {
+    if (data.ok) {
+      success.classList.add('show');
+      this.reset();
+      success.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    } else {
+      alert('发送失败，请稍后重试或直接发送邮件至 xfp0123@gmail.com');
+    }
+  })
+  .catch(() => {
+    alert('网络错误，请稍后重试或直接发送邮件至 xfp0123@gmail.com');
+  })
+  .finally(() => {
     btn.textContent = '发送消息';
     btn.disabled    = false;
-    success.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-  }, 900);
+  });
 });
